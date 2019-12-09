@@ -1,14 +1,11 @@
 function getPublicationById(req,response,client){
-	console.log("test2");
 	const id = req.params.id;
-	console.log(id);
 	const publicationSelectionQuery = {
 		text: 'SELECT * FROM "publication"."publications" where "publication"."publications"."id" = $1',
 		values: [id]
 	}
 	client.query(publicationSelectionQuery, (err, res) => {
 		if (err) {
-			console.log(err.stack);
 			response.send({
 				success: false,
 				code: 400,
@@ -20,9 +17,10 @@ function getPublicationById(req,response,client){
 				response.send({
 					success: false,
 					code: 400,
-					message : 'The publication '+id+' doesn\'t exist in db'
+					message : rows
+					
 				});
-			}else{
+			} else {
 				const publication={
 					"id":rows[0].id,
 					"description" :rows[0].description,
@@ -48,7 +46,6 @@ function getPublicationsByUsername(req,response,client){
 	}
 	client.query(publicationsSelectionQuery, (err, res) => {
 	if (err) {
-		console.log(err.stack);
 		response.send({
 			success: false,
 			code: 400,
@@ -88,7 +85,6 @@ function createPublication(req,response,client){
 	const uidgen = new UIDGenerator();
 	uidgen.generate((err, uid) => {
 		if (err){
-			console.log(err.stack);
 			response.send({
 				success: false,
 				code: 400,
@@ -103,7 +99,6 @@ function createPublication(req,response,client){
 			}
 			client.query(publicationInsertionQuery, (err, res) => {
 				if (err) {
-					console.log(err.stack);
 					response.send({
 						success: false,
 						code: 400,
@@ -129,7 +124,6 @@ function deletePublicationById(req,response,client){
 	}
 	client.query(publicationDeletionQuery, (err, res) => {
 		if (err) {
-			console.log(err.stack);
 			response.send({
 				success: false,
 				code: 400,

@@ -34,7 +34,7 @@ app.use(bodyParser.json());
 myRouter.route('/')
 //permet de prendre en charge toutes les méthodes. 
 .all(function(req,res){ 
-      res.json({message : "Welcome to Instagras user web service", methode : req.method});
+      res.json({message : "Welcome to Instagras publication web service", methode : req.method});
 });
 
 //POST
@@ -45,9 +45,8 @@ myRouter.route('/publicationws/publications')
 
 // GET
 myRouter.route('/publicationws/publications/:id')
-.get(function(req,response){
-  console.log("test1");
-	routes.getPublicationById(req,response,client);
+.get(function(req, response){
+	routes.getPublicationById(req, response, client);
 })
 
 // DELETE
