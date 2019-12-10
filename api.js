@@ -44,12 +44,14 @@ myRouter.route('/publicationws/publications')
 });
 
 // GET
+myRouter.route('/publicationws/publications')
+.get(function(req,response){
+	routes.getPublicationsByUsername(req,response,client);
+})
 myRouter.route('/publicationws/publications/:id')
 .get(function(req,response){
-  console.log("test1");
 	routes.getPublicationById(req,response,client);
 })
-
 // DELETE
 myRouter.route('/publicationws/publications/:id')
 .delete(function(req,response){
