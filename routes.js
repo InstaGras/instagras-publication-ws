@@ -1,3 +1,16 @@
+require('dotenv').config({path: __dirname + '/.env'})
+
+const http = require('http');
+var options = {
+  host: 'works.wtf',
+  path: process.env['api.content.basePathUrl']
+};
+
+var requestify = require('requestify');
+
+
+const baseContentApiUrl = process.env['api.content.basePathUrl']'
+
 function getPublicationById(req,response,client){
 	const id = req.params.id;
 	const publicationSelectionQuery = {
@@ -39,9 +52,9 @@ function getPublicationById(req,response,client){
 }
 
 function getPublicationsByUsername(req,response,client){
-	const username = req.params.username;
+	const username = req.query.username;
 	const publicationsSelectionQuery = {
-		text: 'SELECT * FROM "publication"."publications" where user"."followers".followed_username = $1',
+		text: 'SELECT * FROM "publication"."publications" where "publication"."publications".username = $1',
 		values: [username]
 	}
 	client.query(publicationsSelectionQuery, (err, res) => {
@@ -49,33 +62,48 @@ function getPublicationsByUsername(req,response,client){
 		response.send({
 			success: false,
 			code: 400,
-			message: 'Error while getting the publications\' list of the user '+username
+			message: 'Error while getting the publications of the user '+username
 		});
 		} else {
 			const jsonObject={};
 			const key = 'publications';
 			const rows = res.rows;
 			jsonObject[key] = [];
-			for (var i = 0; i < rows.length; i++) { 
-				var publication={
-					"id":rows[0].id,
-					"description" :rows[0].description,
-					"username":rows[0].username,
-					"creation_date":rows[0].creation_date,
-					"content_id":rows[0].content_id
-				};
-				jsonObject[key].push(publication);
+			for (var i = 0; i < rows.length; i++) {
+				const id=rows[i].id;
+				const description=rows[i].description;
+				const username=rows[i].username;
+				const creation_date=rows[i].creation_date;
+				const contentId;
+				if(row[i].content_id)=='0'{
+					contentId='5f5e6386-997b-4fdd-bb22-b57a5f7a755f';
+				}else{
+					contentId=row[i].content_id;
+				}
+				requestify.get(baseContentApiUrl+'/'+contentId).then(function(response) {
+					var publication={
+						"id":id,
+						"description" :description,
+						"username":username,
+						"creation_date":creation_date,
+						"content":{
+							"data":response.getBody().data
+						}
+					};
+					jsonObject[key].push(publication);
+				},
+				response.send({
+					success: true,
+					code: 200,
+					data :jsonObject
+				});
 			}
-			response.send({
-				success: true,
-				code: 200,
-				data :jsonObject
-			});
+			
 		}
 	})
 }
 
-
+	
 function createPublication(req,response,client){
 	const username = req.body.username;
 	const description = req.body.description;
@@ -156,6 +184,7 @@ function getCurrentDate(){
 
 module.exports = {
 	getPublicationById,
+	getPublicationsByUsername,
 	deletePublicationById,
 	createPublication
 }
